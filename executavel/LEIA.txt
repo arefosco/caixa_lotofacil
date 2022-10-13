@@ -1,0 +1,7 @@
+
+
+-> exe.py (testes)
+-> exe_loop.py (algoritmo principal)
+-> Tudo é feito primeiro em "exe_loop.py" e replicado em "exe.py"
+-> Razão? para manter os testes atualizados e assim não falharem
+-> Mais informações? testes.py (ler docstring)
