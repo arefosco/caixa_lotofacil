@@ -1,7 +1,7 @@
 
 
 from banco_de_dados.banco import dtb, ten_last  # a_a
-from executavel.exe import Card
+from executavel.exe import CardLoopLess
 
 """ IMPORTANTE
   . Como não há variáveis a serem exportadas daqui, a classe 'Card' pode ser usada aqui
@@ -16,11 +16,12 @@ from executavel.exe import Card
 """
 
 # Para usar a função "row_repetition" sem recriá-la aqui, vamos instanciar um objeto de classe "Card"
-obj = Card()
+obj = CardLoopLess(db=dtb, last_game=dtb[-1])
 
 # Onde os resultados serão inseridos
 rank = []
 
+# Cada jogo do banco
 for game in dtb:
     # Como a função da classe precisa de "self.game", é preciso dizer que cada jogo do banco é "self.game"
     obj.game = game

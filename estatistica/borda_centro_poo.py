@@ -81,7 +81,9 @@ class BorderOrCenter:
             # print(box_array)
 
             box_array_sorted = sorted(box_array, key=lambda this_index: this_index[2], reverse=True)
-            # print(box_array_sorted)
+            if self.show_report:
+                print('===== QUANTIDADES DE CANTOS MAIS COMUNS =====')
+                print(box_array_sorted)
 
             box_most_frequent_edges = []
             box_less_frequent_edges = []
@@ -115,7 +117,9 @@ class BorderOrCenter:
             # print(box_array)
 
             box_array_sorted = sorted(box_array, key=lambda this_index: this_index[2], reverse=True)
-            # print(box_array_sorted)
+            if self.show_report:
+                print('===== QUANTIDADES DE CENTROS MAIS COMUNS =====')
+                print(box_array_sorted)
 
             box_most_frequent_centers = []
             box_less_frequent_centers = []
@@ -134,15 +138,16 @@ class BorderOrCenter:
             }
 
     def print_vars(self):
-        print(f"{self.most_common_edges_amount}")
-        print(f"{self.less_common_edges_amount}")
-        print(f"{self.most_common_centers_amount}")
-        print(f"{self.less_common_centers_amount}")
+        print(f"{self.most_common_edges_amount = }")
+        print(f"{self.less_common_edges_amount = }")
+        print(f"{self.most_common_centers_amount = }")
+        print(f"{self.less_common_centers_amount = }")
 
     def __init__(self, db):
         self.database = db
         self.edges = []
         self.centers = []
+        self.show_report = False  # Mudar p/ True p/ ver relatório
 
         self.most_common_edges_amount = self.get_each_game_placement(place='edge')['common']
         self.less_common_edges_amount = self.get_each_game_placement(place='edge')['uncommon']

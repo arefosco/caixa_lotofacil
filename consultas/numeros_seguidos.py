@@ -1,10 +1,11 @@
 
 
 from banco_de_dados.banco import dtb
-from executavel.exe import Card
+from executavel.exe import CardLoopLess
+from estatistica.numeros_seguidos_v2_poo import impropers
 
 # Para usar a função "avoid_long_sequences" sem recriá-la aqui, vamos instanciar um objeto de classe "Card"
-obj = Card()
+obj = CardLoopLess(db=dtb, last_game=dtb[-1])
 
 # Onde os resultados serão inseridos
 rank = []
@@ -13,7 +14,7 @@ for game in dtb:
     # Como a função da classe precisa de "self.game", é preciso dizer que cada jogo do banco é "self.game"
     obj.game = game
     # Após cada análise, se insere em "rank" o resultado se o jogo possui muitos números seguidos
-    rank.append(f"{obj.avoid_long_sequences()['code_str']}")
+    rank.append(f"{obj.avoid_long_sequences(reference=impropers)['code_str']}")
 
 if __name__ == '__main__':
     print('=============================================== RELATÓRIO ===============================================')

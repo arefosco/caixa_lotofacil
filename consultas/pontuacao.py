@@ -1,6 +1,7 @@
 
 
 from banco_de_dados.banco import dtb
+from random import choice
 
 
 def score_admin(
@@ -70,27 +71,33 @@ def score_admin(
 
 if __name__ == '__main__':
 
-    # Jogo alvo a ser comparado com cada jogo existente na história da Lotofácil
-    sample_game = (1, 3, 4, 5, 8, 10, 11, 15, 16, 17, 20, 22, 23, 24, 25)
+    integers = tuple(range(1, 26))
+    sample_game = set({})
+    while len(sample_game) < 15:
+        sample_game.add(choice(integers))
 
     "MÉTODO 1 - Jogo em [target_game] fez as seguintes pontuações de 6 a 15"
-    sample_game_score_panel = score_admin(
-        target_game=sample_game, game_from_db=dtb, single_score=False, target_score=None
-    )
-    print('========== 1 ==========')
+    sample_game_score_panel = score_admin(target_game=sample_game,
+                                          game_from_db=dtb,
+                                          single_score=False,
+                                          target_score=None)
     print(sample_game_score_panel)
 
-    "MÉTODO 2 - Jogo em [target_game] fez a pontuação [target_score]"
-    sample_game_score_specific = score_admin(
-        target_game=sample_game, game_from_db=dtb, single_score=True, target_score=14
-    )
-    print('========== 2 ==========')
+    # Verificar se uma pontuação nunca aconteceu (menos parâmetros)
+    sample_game_score_specific = score_admin(target_game=sample_game,
+                                             game_from_db=dtb,
+                                             single_score=True,
+                                             target_score=14)
+    print('========== Quantas vezes o jogo fez 14 pontos? ==========')
     print(sample_game_score_specific)
 
-    "MÉTODO 3 - Jogo em [target_game] fez a pontuação [target_score] na quantidade [repeated] na comparação [operator]"
-    sample_game_score_specific_repetition = score_admin(
-        target_game=sample_game, game_from_db=dtb, single_score=True, target_score=13,
-        has_comparison=True, operator='greater', repeated=3
-    )
-    print('========== 3 ==========')
-    print(sample_game_score_specific_repetition)
+    # Verificar se uma pontuação já aconteceu (mais parâmetros)
+    sample_game_score_specific_repetition = score_admin(target_game=sample_game,
+                                                        game_from_db=dtb,
+                                                        single_score=True,
+                                                        target_score=13,
+                                                        has_comparison=True,
+                                                        operator='equals',
+                                                        repeated=1)
+    print('========== O jogo já fez 13 pontos somente 1 vez? ==========')
+    print(*['sim' if sample_game_score_specific_repetition else 'não'])

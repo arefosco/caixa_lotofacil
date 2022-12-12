@@ -63,7 +63,7 @@ class GameType:
     def build_main_game_types_array(self):
         # Anexar a string do tipo de jogo (índice 0 na tupla de tipos de jogos)
         box = []
-        [box.append(tuple_index[0]) for tuple_index in self.game_types_rank[0:3]]
+        [box.append(tuple_index[0]) if tuple_index[2] > 10 else None for tuple_index in self.game_types_rank]
         self.game_types = box
         return self.game_types
 
