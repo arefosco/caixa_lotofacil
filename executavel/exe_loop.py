@@ -8,37 +8,31 @@
 # p_a:
     É muito comum os dados do último jogo serem diferentes do próximo (mas não é impossível virem iguais)
     "self.comparisons" guardará todas as comparações que forem consideradas cabíveis entre o jogo cridao e o último
+
+===== PROCEDIMENTO DE IMPLEMENTAÇÃO DE NOVAS FUNÇÕES =====
+1. Criar um algoritmo que filtre os melhores dados de acordo com a necessidade almejada
+1. Nesses algoritmos, normalmente uma variável ou+ de classe é gerada para uso no algoritmo principal (este módulo)
+1. Essa variável é um resultado da filtragem feita pelo algoritmo, e usada nas funções deste módulo
+1. Esses algoritmos normalmente ficam no diretório "estatística"
+2. Importar essa "var de referência" para este módulo
+3. Criar a função que fará uma atividade e inserir no seu contexto, a "var de referência" (externa) como parâmetro
+4. Criar a var self que será objeto dessa função nova
+5. Colocar essa var self (com a chave apropriada) na var self de condição [verify_game_integrity]
+6. Colocar essa var self (com a chave apropriada) na var self que exibe os resultados [build_game_data_report]
 """
 
-# from estatistica.primeiros_numeros import allowed_at_start
 from estatistica.primeiros_numeros_poo import allowed_at_start
-
-# from estatistica.sequencias_seguidas_v2 import worst_sequences
 from estatistica.sequencias_seguidas_v2_poo import worst_sequences
-
-# from estatistica.numeros_seguidos_v2 import impropers
-from estatistica.numeros_seguidos_v2_poo import impropers  # h_a
-
-# from estatistica.tipo_de_jogo_v2 import game_types
-from estatistica.tipo_de_jogo_v2_poo import game_types  # i_a
-
-# from estatistica.contar_numeros_primos_v2 import primes
-from estatistica.contar_numeros_primos_v2_poo import (prime_numbers_amount_allowed, most_common_primes)  # j_a
-
-# from estatistica.frequencia_numeros import (most_frequent, percentages)
+from estatistica.numeros_seguidos_v2_poo import impropers
+from estatistica.tipo_de_jogo_v2_poo import game_types
+from estatistica.contar_numeros_primos_v2_poo import (prime_numbers_amount_allowed, most_common_primes)
 from estatistica.frequencia_numeros_poo import (most_frequent_numbers, percentages)
-
-# from estatistica.grupos_de_numeros import three_in_a_row_common
 from estatistica.grupos_de_numeros_poo import most_common_sequences_of_3_amount
-
-# from estatistica.borda_centro import (most_frequent_edges, most_frequent_centers)
 from estatistica.borda_centro_poo import (most_frequent_edges, most_frequent_centers)
-
 from estatistica.grupos_horizontais_poo import common_horizontal_thread_groups
-
 from estatistica.grupos_verticais_poo import common_vertical_thread_groups
-
 from estatistica.numeros_centro import good_middle_numbers
+from estatistica.historico_numeros import (proper_numbers_by_position, tolerable_mistakes)
 
 from banco_de_dados.banco import dtb, ten_last
 from funcoes.banco_de_dados import ink, ink_random
@@ -442,7 +436,8 @@ class Card:
         return {'ok': False, 'report': game_class}
 
     # j_a
-    def prime_numbers_counter(self, references) -> dict:
+    @staticmethod
+    def prime_numbers_counter(target_game, references) -> dict:
         """
         Mais informações || estatistica/contar_numeros_primos_v2_poo.py
         Teste            || testes.py/test_prime_numbers_counter
@@ -457,7 +452,7 @@ class Card:
 
         ""
         # O que for achado em "self.game" de número primo é inserido em "prime_numbers_box"
-        for number in self.game:
+        for number in target_game:
             if number in prime_numbers:
                 prime_numbers_box.append(number)
 
@@ -480,8 +475,8 @@ class Card:
         # A quantidade de números primos encontrados está entre as quantidades mais recorrentes
         array_size = len(prime_numbers_box)
         if len(prime_numbers_box) in references[0]:
-            return {'ok': True, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]'}
-        return {'ok': False, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]'}
+            return {'ok': True, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]', 'array': prime_numbers_box}
+        return {'ok': False, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]', 'array': prime_numbers_box}
 
     # k_a
     def score_admin(self, single_score, score, has_comparison=False, operator='equals', repeated=0) -> [int, str]:
@@ -849,14 +844,15 @@ class Card:
             }
         return {'ok': False, 'report': game_code_str, 'full_report': f' {game_code_str} [inexistente]'}
 
-    def middle_number(self, reference):
+    # s_a
+    def middle_number(self, reference: list) -> dict:
         middle_number = self.game[7]
         if middle_number in reference:
             return {'ok': True, 'report': middle_number}
         return {'ok': False, 'report': middle_number}
 
     # Não está sendo usado
-    def divisible_3(self, reference):
+    def divisible_3(self, reference: list) -> dict:
         box = []
         for number in self.game:
             if not number % 3:
@@ -868,7 +864,7 @@ class Card:
         return {'ok': False, 'report': f'{string_code} {box}'}
 
     # Não está sendo usado
-    def mean_first_15_numbers(self, reference):
+    def mean_first_15_numbers(self, reference: list) -> dict:
         upper = []
         for number in self.game:
             if number in range(1, 16):
@@ -879,7 +875,86 @@ class Card:
             return {'ok': True, 'report': mean_calculus}
         return {'ok': False, 'report': mean_calculus}
 
-    def verify_game_integrity(self):
+    # Não está sendo usado
+    def has_most_frequent_recent_numbers(self, reference: dict) -> dict:
+        game_as_set = set(self.game)
+        reference_common_numbers = set(reference)
+        similarity = set(game_as_set).intersection(set(reference_common_numbers))
+        similarity_length = len(similarity)
+
+        if reference['40%'] <= similarity_length <= reference['70%']:
+            return {'ok': True, 'report': similarity}
+        return {'ok': False, 'report': similarity}
+
+    def game_numbers_position(self, references: list) -> dict:
+        """
+        Vamos tomar o valor abaixo como exemplo
+        Ele representa o histórico de cada índice de cada jogo na história da Lotofácil
+        Ex: '1st' representa os números mais comuns ao primeiro número dentre todos os jogos
+        Ex: '2nd' representa os números mais comuns ao segundo número dentre todos os jogos
+        E assim suscesivamente...
+        references[0] = {
+            '1st': [1, 2, 3],
+            '2nd': [2, 3, 4],
+            '3rd': [3, 4, 5, 6],
+            '4th': [4, 5, 6, 7, 8],
+            '5th': [6, 7, 8, 9, 10],
+            '6th': [8, 9, 10, 11, 12],
+            '7th': [9, 10, 11, 12, 13],
+            '8th': [11, 12, 13, 14, 15],
+            '9th': [13, 14, 15, 16, 17],
+            '10th': [14, 15, 16, 17, 18],
+            '11th': [16, 17, 18, 19, 20],
+            '12th': [18, 19, 20, 21, 22],
+            '13th': [20, 21, 22, 23],
+            '14th': [22, 23, 24],
+            '15th': [24, 25]
+        }
+
+        No loop for, é desejado saber se cada índice de "self.game" está dentro de cada um dos dados em "references[0]"
+        Obviamente, para isso dar certo, "self.game" e "references[0]" possuem qtd. de índices equivalentes
+        "references[0]" vêm a partir de "proper_numbers_by_position", criado em "estatistica/historico_numeros"
+        Neste loop, cada índice de "self.game" é procurado em cada chave. O resultado do procura é inserido em "result"
+        Se o índice em "self.game" é achado na chave correspondente: "result" recebe "True", senão, recebe "False"
+        Para saber os erros, é contado quantos "False" foram anexados a "result", via "mistakes"
+        Após se ter o resultado, "mistakes" é comparado a "tolerable_mistakes", criado em "estatistica/historico_numeros"
+        "tolerable_mistakes" é a var em "references[1]"
+        "tolerable_mistakes" contêm as qtds. de erros mais comuns (as >= a 10% foram consideradas)
+        No tempo que essa função foi criada, as qtds. eram [0, 1, 2, 3], enquanto as outras não alcançaram 10%
+        Porém, essa variável pode mudar conforme novos jogos vão acontecendo
+
+        INTREPRETAÇÃO:
+            "self.game", pela lógica, é aceitável se possuir: 15, 14, 13, 12 números dentro de "references[0]"
+        """
+        # Recebe uma sequência de "True" e "False" (15 no total)
+        result = []
+
+        # "reference" têm todas essas chaves, que estão na mesma qtd. de "self.game" (15)
+        positions = [
+            '1st', '2nd', '3rd', '4th', '5th',
+            '6th', '7th', '8th', '9th', '10th',
+            '11th', '12th', '13th', '14th', '15th'
+        ]
+
+        # Leia a documentação da função
+        for index in range(len(self.game)):
+            if self.game[index] in references[0][positions[index]]: result.append(True)
+            else: result.append(False)
+
+        # Leia a documentação da função
+        mistakes = result.count(False)
+
+        "CÓDIGO REMOVIDO"
+        # suitable_percentage = 70
+        # data_length = len(self.game)
+        # percentage_70 = int((suitable_percentage * data_length) / 100)
+        # max_mistakes = data_length - percentage_70
+
+        if mistakes in references[1]:
+            return {'ok': True, 'report': f'Erros cometidos: {mistakes}'}
+        return {'ok': False, 'report': f'Erros cometidos: {mistakes}'}
+
+    def verify_game_integrity(self) -> None:
         self.conditions = {
             1: self.result.append(True) if self.game_horizontal_blank_free['ok'] else self.result.append(False),
             2: self.result.append(True) if self.game_vertical_blank_free['ok'] else self.result.append(False),
@@ -901,9 +976,10 @@ class Card:
             18: self.result.append(True) if self.game_horizontal_code['ok'] else self.result.append(False),
             19: self.result.append(True) if self.game_vertical_code['ok'] else self.result.append(False),
             20: self.result.append(True) if self.game_middle_number['ok'] else self.result.append(False),
+            21: self.result.append(True) if self.game_history_numbers['ok'] else self.result.append(False)
         }
 
-    def compare_game_with_last_game(self):
+    def compare_game_with_last_game(self) -> None:
         """
         1: Último jogo têm números de canto != das do jogo criado (podem ter qtd. ==)
         2: Último jogo têm números de centro != das do jogo criado (podem ter qtd. ==)
@@ -919,10 +995,38 @@ class Card:
             3: self.comparisons.append(True) if self.last_game_horizontal_code['report'] != self.game_horizontal_code['report']
             else self.comparisons.append(False),
             4: self.comparisons.append(True) if self.last_game_vertical_code['report'] != self.game_vertical_code['report']
+            else self.comparisons.append(False),
+            5: self.comparisons.append(True) if self.last_game_prime_numbers['array'] != self.game_prime_numbers['array']
             else self.comparisons.append(False)
         }
 
-    def build_game_data_report(self):
+    def build_game_data_report(self) -> None:
+        different_border_assertion = ink('blue', str(self.comparisons[0]))
+        different_center_assertion = ink('blue', str(self.comparisons[1]))
+        different_horizontal_group_assertion = ink('blue', str(self.comparisons[2]))
+        different_vertical_group_assertion = ink('blue', str(self.comparisons[3]))
+        different_prime_numbers_assertion = ink('blue', str(self.comparisons[4]))
+
+        new_game_data = {
+            'edge_drawing': ink('green', str(self.game_edges['array'])),
+            'edge_length': ink('green', str(self.game_edges['report'])),
+            'center_drawing': ink('green', str(self.game_center['array'])),
+            'center_length': ink('green', str(self.game_center['report'])),
+            'horizontal_code_drawing': ink('green', str(self.game_horizontal_code['report'])),
+            'vertical_code_drawing': ink('green', str(self.game_vertical_code['report'])),
+            'prime_numbers': ink('green', str(self.game_prime_numbers['report']))
+        }
+
+        last_game_data = {
+            'edge_drawing': ink('yellow', str(self.last_game_edge['array'])),
+            'edge_length': ink('yellow', str(self.last_game_edge['report'])),
+            'center_drawing': ink('yellow', str(self.last_game_center['array'])),
+            'center_length': ink('yellow', str(self.last_game_center['report'])),
+            'horizontal_code_drawing': ink('yellow', str(self.last_game_horizontal_code['report'])),
+            'vertical_code_drawing': ink('yellow', str(self.last_game_vertical_code['report'])),
+            'prime_numbers': ink('yellow', str(self.last_game_prime_numbers['report']))
+        }
+
         self.report = f"""
         |1| Sem linhas em branco?                      || {self.result[0]} / {self.game_horizontal_blank_free['report']}
         |2| Sem colunas em branco?                     || {self.result[1]} / {self.game_vertical_blank_free['report']}
@@ -944,39 +1048,39 @@ class Card:
         |15| Possui grupo horizontal comum?            || {self.result[17]} / {self.game_horizontal_code['full_report']}
         |16| Possui grupo vertical comum?              || {self.result[18]} / {self.game_vertical_code['full_report']}
         |17| O número do meio está entres os comuns?   || {self.result[19]} / {self.game_middle_number['report']}
+        |18| Há números de índice comuns ao histórico? || {self.result[20]} / {self.game_history_numbers['report']}
 
         =========== JOGO CRIADO vs ÚLTIMO JOGO ===========
-
-        ========== CONDIÇÃO 1 e 2 ==========
-        |1| Bordas diferentes? [{ink('blue', str(self.comparisons[0]))}]
+        |1| Bordas diferente? [{different_border_assertion}]
         {self.label}
-        {ink('green', str(self.game_edges['array']))} / {ink('green', str(self.game_edges['report']))}
-        {ink('yellow', str(self.last_game_edge['array']))} / {ink('yellow', str(self.last_game_edge['report']))}
+        {new_game_data['edge_drawing']} / {new_game_data['edge_length']}
+        {last_game_data['edge_drawing']} / {new_game_data['edge_length']}
 
-        ========== CONDIÇÃO 3 e 4 ==========
-        |1| Centros diferentes? [{ink('blue', str(self.comparisons[1]))}]
+        |2| Centros diferente? [{different_center_assertion}]
         {self.label}
-        {ink('green', str(self.game_center['array']))} / {ink('green', str(self.game_center['report']))}
-        {ink('yellow', str(self.last_game_center['array']))} / {ink('yellow', str(self.last_game_center['report']))}
+        {new_game_data['center_drawing']} / {new_game_data['center_length']}
+        {last_game_data['center_drawing']} / {last_game_data['center_length']}
 
-        ========== CONDIÇÃO 5 ==========
-        |2| Grupo horizontal diferentes? [{ink('blue', str(self.comparisons[2]))}]
+        |3| Grupo horizontal diferente? [{different_horizontal_group_assertion}]
         {self.label}
-        {ink('green', str(self.game_horizontal_code['report']))} / {ink('yellow', str(self.last_game_horizontal_code['report']))}
+        {new_game_data['horizontal_code_drawing']} / {last_game_data['horizontal_code_drawing']}
         
-        ========== CONDIÇÃO 6 ==========
-        |2| Grupo vertical diferentes? [{ink('blue', str(self.comparisons[3]))}]
+        |4| Grupo vertical diferente? [{different_vertical_group_assertion}]
         {self.label}
-        {ink('green', str(self.game_vertical_code['report']))} / {ink('yellow', str(self.last_game_vertical_code['report']))}
+        {new_game_data['vertical_code_drawing']} / {last_game_data['vertical_code_drawing']}
+        
+        |5| Números primos diferente? [{different_prime_numbers_assertion}]
+        {self.label}
+        {new_game_data['prime_numbers']} / {last_game_data['prime_numbers']}
         """
 
-    def store_approved_game(self):
+    def store_approved_game(self) -> None:
         Card.storage.append(self.game)
 
-    def display_game_data_report(self):
+    def display_game_data_report(self) -> None:
         print(self.report)
 
-    def display_proof(self):
+    def display_proof(self) -> None:
         existing_conditions = len(self.result)
         satisfied_conditions = self.result.count(True)
         is_game_ok = "".join(["sim" if False not in self.result else "não"])
@@ -993,7 +1097,7 @@ class Card:
         for game in Card.storage:
             print(self.indent, game)
 
-    def game_disqualified(self):
+    def game_disqualified(self) -> None:
         brick = '=' * 100
         report = f"""
         {brick}
@@ -1049,6 +1153,11 @@ class Card:
                     reference=common_vertical_thread_groups
                 )
 
+                self.last_game_prime_numbers = self.prime_numbers_counter(
+                    target_game=self.last_game,
+                    references=[prime_numbers_amount_allowed, most_common_primes]
+                )
+
                 # *****************************************************************************************************
                 # *****************************************************************************************************
                 # *****************************************************************************************************
@@ -1093,6 +1202,7 @@ class Card:
                 # -----> estatistica/contar_numeros_primos_v2_poo.py
                 # j_a: Jogo deve ter quantidade de números primos entre as quantidades mais recorrentes
                 self.game_prime_numbers = self.prime_numbers_counter(
+                    target_game=self.game,
                     references=[prime_numbers_amount_allowed, most_common_primes]
                 )
 
@@ -1152,6 +1262,12 @@ class Card:
                 # -----> estatistica/numeros_centro.py
                 # s_a: Jogo deve ter seu número do meio dentro dos estipulados em "reference"
                 self.game_middle_number = self.middle_number(reference=good_middle_numbers)
+
+                # -----> estatistica/historico_numeros.py
+                # Jogo deve ter cada número de índice dentro dos mais comuns em suas respectivas posições
+                self.game_history_numbers = self.game_numbers_position(
+                    references=[proper_numbers_by_position, tolerable_mistakes]
+                )
 
                 # ====================================== PARTE FINAL DO ALGORITMO ======================================
                 # Var de confirmação de que "self.game" cumpre todos os requisitos (não deve ter índice False)

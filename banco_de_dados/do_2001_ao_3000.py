@@ -686,8 +686,12 @@ from_two_thousand_one_to_three_thousand = [
     (3,4,6,7,8,9,10,11,12,14,15,16,19,23,24),
     (1,2,3,4,8,10,11,12,13,14,20,21,22,23,25),
     (2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 20, 22, 23, 25),
-    (4, 5, 6, 7, 8, 9, 11, 16, 17, 18, 20, 21, 22, 24, 25)
+    (4, 5, 6, 7, 8, 9, 11, 16, 17, 18, 20, 21, 22, 24, 25),
+    (1, 3, 4, 5, 7, 8, 9, 13, 14, 15, 16, 19, 20, 21, 24),
+    (3, 4, 5, 6, 7, 10, 11, 13, 14, 15, 16, 19, 20, 21, 22)
 ]
 
 if __name__ == '__main__':
-    print(len(from_two_thousand_one_to_three_thousand))
+    this_database_length = len(from_two_thousand_one_to_three_thousand)
+    print(f'O banco atual possui {this_database_length} índices')
+    print(f'Faltam {1000 - this_database_length} jogos para a criação do próximo arquivo')

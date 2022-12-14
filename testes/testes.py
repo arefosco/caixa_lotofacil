@@ -96,6 +96,9 @@ class CardLoopLessTest(TestCase):
             # a_i: test_middle_number
             'middle_is_15': (1, 4, 5, 6, 7, 10, 11, 15, 18, 19, 20, 21, 22, 23, 25),
             'middle_is_16': (1, 4, 5, 6, 7, 10, 15, 16, 18, 19, 20, 21, 22, 23, 25),
+            # a_j: test_game_numbers_position
+            'has_3_uncommon_numbers': (4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24),
+            'has_4_uncommon_numbers': (4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24)
         }
 
         # a_c
@@ -127,6 +130,17 @@ class CardLoopLessTest(TestCase):
 
         # a_i: estatistica/numeros_centro.py
         self.proper_middle_numbers = list(range(11, 16))
+
+        # a_j: estatistica/historico_numeros.py [proper_numbers_by_position]
+        self.games_history_numbers_by_index = {
+            '1st': [1, 2, 3], '2nd': [2, 3, 4], '3rd': [3, 4, 5, 6], '4th': [4, 5, 6, 7, 8], '5th': [6, 7, 8, 9, 10],
+            '6th': [8, 9, 10, 11, 12], '7th': [9, 10, 11, 12, 13], '8th': [11, 12, 13, 14, 15],
+            '9th': [13, 14, 15, 16, 17], '10th': [14, 15, 16, 17, 18], '11th': [16, 17, 18, 19, 20],
+            '12th': [18, 19, 20, 21, 22], '13th': [20, 21, 22, 23], '14th': [22, 23, 24], '15th': [24, 25]
+        }
+
+        # a_j: estatistica/historico_numeros.py [tolerable_mistakes]
+        self.max_mistakes_for_common_numbers = [0, 1, 2, 3]
 
     def test_sequence_horizontal(self):
         self.obj.game = self.games['all_rows_filled']
@@ -226,12 +240,16 @@ class CardLoopLessTest(TestCase):
         # Jogo possui quantidade de primos apropriada
         self.obj.game = self.games['prime_numbers_len_ok']
         self.assertEqual(self.obj.prime_numbers_counter(
-            references=[self.prime_numbers_amount_allowed, self.most_common_primes])['ok'], True)
+            target_game=self.obj.game,
+            references=[self.prime_numbers_amount_allowed, self.most_common_primes]
+        )['ok'], True)
 
         # Jogo não possui quantidade de primos apropriada
         self.obj.game = self.games['prime_numbers_len_not_ok']
         self.assertEqual(self.obj.prime_numbers_counter(
-            references=[self.prime_numbers_amount_allowed, self.most_common_primes])['ok'], False)
+            target_game=self.obj.game,
+            references=[self.prime_numbers_amount_allowed, self.most_common_primes]
+        )['ok'], False)
 
     # [PROBLEMA]: com o passar do tempo, este jogo pode fazer 14/15 pontos e esse teste falhará
     # [SOLUÇÃO]:  executar o algoritmo e pegar outro jogo para substituir o primeiro "self.obj.game"
@@ -389,3 +407,19 @@ class CardLoopLessTest(TestCase):
 
         self.obj.game = self.games['middle_is_16']
         self.assertEqual(self.obj.middle_number(reference=self.proper_middle_numbers)['ok'], False)
+
+    # a_j
+    # OBS: [PROBLEMA] parâmetros são variáveis, ou seja, os testes pode passar ou falhar com o passar do tempo
+    # OBS: [SOLUÇÃO]  os parâmetros ganham um valor fixo apenas neste teste
+    def test_game_numbers_position(self):
+        # Jogo com 3 erros (3 números não estão entre os mais comuns em seus respectivos índices) (máximo permitido)
+        self.obj.game = self.games['has_3_uncommon_numbers']
+        self.assertEqual(self.obj.game_numbers_position(
+            references=[self.games_history_numbers_by_index, self.max_mistakes_for_common_numbers]
+        )['ok'], True)
+
+        # Jogo com 4 erros (4 números não estão entre os mais comuns em seus respectivos índices)
+        self.obj.game = self.games['has_4_uncommon_numbers']
+        self.assertEqual(self.obj.game_numbers_position(
+            references=[self.games_history_numbers_by_index, self.max_mistakes_for_common_numbers]
+        )['ok'], False)
