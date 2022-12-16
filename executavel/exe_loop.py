@@ -45,6 +45,18 @@ class Card:
 
     # a_a
     def create_game(self, length: int):
+        """
+        ===== self.game ===== \n
+        * o jogo é inicialmente um conjunto vazio \n
+        * motivo? conjuntos não repetem dados, e um jogo da Lotofácil segue esse padrão \n
+
+        ===== card ===== \n
+        * representa semanticamente o volante de um jogo da Lotofácil (cartilha com 25 números, 1 ao 25) \n
+
+        ===== loop ===== \n
+        * enquanto "self.game" não tiver 15 números diferentes: não há jogo
+        """
+
         from random import choice
 
         self.game = set({})
@@ -60,20 +72,37 @@ class Card:
     # b_a
     def sequence_horizontal(self) -> dict:
         """
-        Mais informações || consultas/espaco_horizontal_branco.py
-        Teste            || testes.py/test_sequence_horizontal
+        ===== Mais informações ===== \n
+        * consultas/espaco_horizontal_branco.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_sequence_horizontal \n
+
+        ===== row_int ===== \n
+        * sequência de 5 vars que são contadoras de qtd. de números por linha (horizontal) \n
+        * "self.game" possui 15 números escolhidos entre 1 a 25, a incrementação das vars "row" é explicada a seguir \n
+        *  "row_1: 1 ao 5"   "row_2: 6 ao 10"   "row_3: 11 ao 15"   "row_4: 16 ao 20"   "row_5: 21 ao 25" \n
+        * essa incrementação acontece no loop for (ver Análise [1]) \n
+
+        ===== game_horizontal ===== \n
+        * ao termos todas as incrementação feitas nas vars "row_int", esses valores são anexados nesta var \n
+        * temos um array com um código de sequências de inteiros que representam a contagem de números por linha \n
+
+        ===== condição final ===== \n
+        * o objetivo da função é não deixar passar "self.game" com linhas vazias (padrão incomum) \n
+        * isso é detectado pela presença de 0 dentre os índices de "game_horizontal" \n
+        * não havendo 0 em "game_horizontal": jogo válido
         """
 
         row_1, row_2, row_3, row_4, row_5 = 0, 0, 0, 0, 0
 
-        # Cada linha do volante em ordem crescente
         row_1_numbers = [*range(1, 6)]
         row_2_numbers = [*range(6, 11)]
         row_3_numbers = [*range(11, 16)]
         row_4_numbers = [*range(16, 21)]
         row_5_numbers = [*range(21, 26)]
 
-        # Estou ciente de que as ações deveriam estar nas linhas abaixo, mas é desejado economizar linhas
+        # Análise [1]
         for number in self.game:
             if number in row_1_numbers: row_1 += 1
             elif number in row_2_numbers: row_2 += 1
@@ -90,8 +119,27 @@ class Card:
     # c_a
     def sequence_vertical(self) -> dict:
         """
-        Mais informações || consultas/espaco_vertical_branco.py
-        Teste            || testes.py/test_sequence_vertical
+        ===== Mais informações ===== \n
+        * consultas/espaco_vertical_branco.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_sequence_vertical \n
+
+        ===== column_int ===== \n
+        * sequência de 5 vars que são contadoras de qtd. de números por coluna (vertical) \n
+        * "self.game" possui 15 números escolhidos entre 1 a 25, a incrementação das vars "column" é explicada abaixo \n
+        * ex: column_1 é incrementada conforme um dos números de self.game" for encontrado em "column_1_numbers" \n
+        * a lógica acima se aplica até o inteiro 5, pois temos 5 linhas e 5 colunas \n
+        * essa incrementação acontece no loop for (ver Análise [1]) \n
+
+        ===== game_vertical ===== \n
+        * ao termos todas as incrementação feitas nas vars "column_int", esses valores são anexados nesta var \n
+        * temos um array com um código de sequências de inteiros que representam a contagem de números por coluna \n
+
+        ===== condição final ===== \n
+        * o objetivo da função é não deixar passar "self.game" com colunas vazias (padrão incomum) \n
+        * isso é detectado pela presença de 0 dentre os índices de "game_vertical" \n
+        * não havendo 0 em "game_vertical": jogo válido
         """
 
         column_1, column_2, column_3, column_4, column_5 = 0, 0, 0, 0, 0
@@ -102,7 +150,7 @@ class Card:
         column_4_numbers = [4, 9, 14, 19, 24]
         column_5_numbers = [5, 10, 15, 20, 25]
 
-        # Estou ciente de que as ações deveriam estar nas linhas abaixo, mas é desejado economizar linhas
+        # Análise [1]
         for number in self.game:
             if number in column_1_numbers: column_1 += 1
             elif number in column_2_numbers: column_2 += 1
@@ -119,111 +167,95 @@ class Card:
     # d_a
     def proper_gap(self, reference) -> dict:
         """
-        Mais informações || estatistica/primeiros_numeros_poo.py (executar)
-        Teste            || testes.py/test_proper_gap
+        ===== Mais informações ===== \n
+        * estatistica/primeiros_numeros_poo.py
+
+        ===== Teste ===== \n
+        * testes/testes.py/test_proper_gap \n
+
+        ===== result ===== \n
+        * var que recebe booleanos e strings vindo de 3 análises diferentes
+        * as análises estão marcadas por (# Análise int) no conteúdo da função
+
+        ===== calculus ===== \n
+        * recebe a subtração do índice posterior pelo índice anterior de "self.game"
+        * (índice 1 - índice 0)...(índice 2 - índice 1)...(índice 3 - índice 2)...
+        * esses valores são essenciais p/ as vars "gap_of_3_amount" e "gap_of_4_amount"
+
+        ===== gap_of_3_amount ===== \n
+        * var que verifica "result", procurando valores 4 (lacunas de 3)
+        * lacunas de 3 acontecem com alguma frequência, mas não são maioria
+        * é estipulado que um jogo normal, tenha no máximo 1 lacuna de 3, ou nenhuma
+        * se seu valor for > 1 (mais de uma lacuna de 3): jogo invalidado, pois "result" recebe "gap_overflow_3"
+
+        ===== gap_of_4_amount ===== \n
+        * var que verifica "result", procurando valores 5 (lacunas de 4)
+        * lacunas de 4 são incomuns, por isso devem ser evitadas/barradas
+        * é estipulado que um jogo normal, não tenha lacunas de 4
+        * se seu valor for != 0 (há alguma lacuna de 4): jogo invalidado, pois "result" recebe "gap_overflow_4"
+
+        ===== Condições finais ===== \n
+        * "result" não tendo "overflow_gap_3", "overflow_gap_4": jogo válido
         """
 
-        # Não pode anexar "False", "overflow_gap_3" e "overflow_gap_4"
         result = []
-        # Não é importante, mas é útil para ver as subtrações feitas no tratamento 2
         calculus = []
 
-        "TRATAMENTO 1 (trocado pelo parâmetro 'reference')"
-        # # Primeiro número do volante é pelo menos 5, indica uma lacuna grande e incomum (descartável)
-        # if self.game[0] >= 5: result.append(False)
-        # # Jogo iniciando com 4 ou menos é aprovável (pois a lacuna é de 3)
-        # if self.game[0] <= 4: result.append(True)
-        # # Se o último número do volante for entre 16 a 21, há várias lacunas maiores do que 3 (descartável)
-        # if self.game[-1] in range(16, 22): result.append(False)
-
-        "TRATAMENTO 2 (evitar lacunas maiores que 5)"
         index_first = 0
         index_second = 1
 
-        # Índices do jogos são subtraídos entre si (posterior - anterior) e o resultado não deve exceder 5
         while index_second < len(self.game):
             calculus.append(self.game[index_second] - self.game[index_first])
-            # Se a subtração for maior que 5: jogo reprovado (lacuna muito grande)
-            if self.game[index_second] - self.game[index_first] > 5:
-                result.append(False)
 
             index_first += 1
             index_second += 1
 
-        "TERCEIRO TRATAMENTO (evitar + do que uma lacuna grande de cada tipo)"
-        # calculus_str = [math_ for math_ in calculus]
         gap_of_3_amount = calculus.count(4)
         gap_of_4_amount = calculus.count(5)
 
-        # O jogo pode ter: 1 lacuna de 3, nenhuma de 4, caso contrário, "result" recebe dados que reprovam o jogo
-        if gap_of_3_amount > 1:
-            result.append('overflow_gap_3')
-        if gap_of_4_amount != 0:
-            result.append('overflow_gap_4')
+        # Análise [1]: O jogo só pode ter 1 lacuna de 3
+        if gap_of_3_amount > 1: result.append('overflow_gap_3')
+        # Análise [2]: O jogo não pode ter qualquer lacuna de 4
+        if gap_of_4_amount != 0: result.append('overflow_gap_4')
 
-        "TRATAMENTO 4 (dados do jogo devem estar em 'references')"
-
-        "REMOVIDOS (últimas condições de cada condição abaixo)"
-        # Motivo? Mudança de ideia na questão de achar relevante
-        # or self.game[-1] not in references[1]
-        # and self.game[-1] in references[1]
-
-        # O jogo reprovado têm: algum "False" em "result" ou (+ de 1 lacuna de 3) ou (+ de 1 lacuna de 4)
-        if False in result \
-                or 'overflow_gap_3' in result \
-                or 'overflow_gap_4' in result \
-                or self.game[0] not in reference:
+        # Jogo reprovado
+        if 'overflow_gap_3' in result or 'overflow_gap_4' in result or self.game[0] not in reference:
             return {'ok': False, 'report': calculus, 'data': result}
 
-        # Jogo aceitável: (máx de 1 lacuna de 3 ou nenhuma)
-        if False not in result \
-                and 'overflow_gap_3' not in result \
-                and 'overflow_gap_4' not in result \
-                and self.game[0] in reference:
+        # Jogo aprovado
+        if 'overflow_gap_3' not in result and 'overflow_gap_4' not in result and self.game[0] in reference:
             return {'ok': True, 'report': calculus, 'data': result}
 
     # e_a
     def avoid_large_odd_even_sequence(self, reference) -> dict:
         """
-        Mais informações || estatistica/sequencias_seguidas_v2_poo.py (executar)
-        Teste            || testes/test_avoid_large_odd_even_sequence
+        ===== Mais informações ===== \n
+        * estatistica/sequencias_seguidas_v2_poo.py
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_avoid_large_odd_even_sequence \n
+
+        ===== box ===== \n
+        * recebe strings ['i' = ìmpar] e ['p' = par] ao iterar sob cada índice de "self.game" \n
+
+        ===== game_string ===== \n
+        * converte a lista com 'i' e 'p' p/ uma string de todas elas mescladas \n
+        * o valor dessa string não deve estar em "reference", senão será invalidado \n
+
+        ===== reference ===== \n
+        * var fonte que possui todas as piores sequências string de 'i' e 'p' (mais incomuns) \n
+
+        ===== must_have_false_only ===== \n
+        * var de confirmação que recebe "True" e "False" \n
+        * se há "True", "self.game" possui uma sequência de 'i' e 'p' dentre as piores sequências: jogo inválido
         """
 
         box = []
-
-        # Um jogo analizado "self.game" têm seus números pares convertidos em 'p' e ímpares em 'i'
         odd, even = 'p', 'i'
-
-        "Substituído por [ reference ]"
-        # odd_flood_4, odd_flood_5, odd_flood_6, odd_flood_7 = 'pppp', 'ppppp', 'pppppp', 'ppppppp'
-        # even_flood_4, even_flood_5, even_flood_6, even_flood_7 = 'iiii', 'iiiii', 'iiiiii', 'iiiiiii'
-
         [box.append(odd) if not number % 2 else box.append(even) for number in self.game]
-
-        # A partir do jogo, é criada uma variável string somente com letras 'p' e 'i'
         game_string = "".join(box)
 
         must_have_false_only = []
-
-        "Código antigo"
-        # Qual a razão disso? evitar muitos "if" e "not" seguidos numa linha (sintaxe fica bagunçada)
-        # conditions = {
-        #     1: proper_data.append(True) if odd_flood_4 not in box else proper_data.append(False),
-        #     2: proper_data.append(True) if odd_flood_5 not in box else proper_data.append(False),
-        #     3: proper_data.append(True) if odd_flood_6 not in box else proper_data.append(False),
-        #     4: proper_data.append(True) if odd_flood_7 not in box else proper_data.append(False),
-        #     5: proper_data.append(True) if even_flood_4 not in box else proper_data.append(False),
-        #     6: proper_data.append(True) if even_flood_5 not in box else proper_data.append(False),
-        #     7: proper_data.append(True) if even_flood_6 not in box else proper_data.append(False),
-        #     8: proper_data.append(True) if even_flood_7 not in box else proper_data.append(False),
-        # }
-
-        "Código antigo"
-        # Não havendo quaisquer sequências de 4, 5, 6, 7 pares ou ímpares seguidos, o jogo é aprovado
-        # if False not in proper_data:
-        #     return {'is_proper': True, 'game_string': box, 'result': proper_data}
-        # Caso contrário, é reprovado
-        # return {'is_proper': False, 'game_string': box, 'result': proper_data}
 
         for code in reference: must_have_false_only.append(code in game_string)
 
@@ -234,58 +266,83 @@ class Card:
     # f_a
     def row_repetition(self) -> dict:
         """
-        Mais informações: consultas/linhas_repetidas.py (executar)
+        ===== Mais informações ===== \n
+        * consultas/linhas_repetidas.py \n
+
+        ===== Testes da função ===== \n
+        * testes/testes.py/test_row_repetition \n
+
+        ===== array_of_ones ===== \n
+        * array com 15 índices 1, onde "1" é a representação de números que foram chamados no jogo \n
+
+        ===== array_of_zeros ===== \n
+        * array com 10 índices 0, onde "0" é a representação de números que não foram chamados no jogo \n
+
+        ===== ones_to_receive_1 ===== \n
+        * possui todos os índices de "self.game" \n
+        * sua conversão p/ conjunto é necessária, pois é preciso coletar os números que não vieram \n
+
+        ===== ones_to_receive_zero ===== \n
+        * possui todos os números que "self.game" não possui (fora do jogo) \n
+
+        ===== ones_inside_game ===== \n
+        * junção de "self.game" + "array_of_ones" (o que é possível por terem a mesma qtd. de índices) \n
+
+        ===== ones_outside_game ===== \n
+        * junção de "self.game" + "array_of_zeros" (o que é possível por terem a mesma qtd. de índices) \n
+        * essa var será mesclada a "ones_inside_game" (ver # Junção) \n
+
+        ===== tuples_ordered ===== \n
+        * "ones_outside_game" passa a ser parte integrante de "ones_inside_game", deixando os dados desordenados \n
+        * essa var organiza os números em ordem crescente, pois eles precisam estar na sua posição original \n
+        * ex: tuples_ordered = [[1, 1], [2, 0], [3, 0], [4, 1], [5, 1]] \n
+
+        ===== binary_result ===== \n
+        * anexa todos os índices aninhados [1] de "tuples_ordered" \n
+        * usando o exemplo acima, binary_result = [1, 0, 0, 1, 1] \n
+        * esse procedimento é feito em todas as linhas, gerando 25 índices de 0 e 1 \n
+
+        ===== binary_group_int ===== \n
+        * var que desmembra os índices de "binary_result" em grupos de 5 (5 x 5 = 25 números) \n
+        * o objetivo disso é ter as 5 linhas de forma binária e saber se alguma deles é repetida \n
+        * todas as vars binárias "binary_group_int" são inseridas em "row_code" \n
+
+        ===== row_code ===== \n
+        * conjunto que recebe 5 strings binárias (se nenhuma delas for igual) \n
+        * caso haja igualdade, apenas uma das duas é anexada a esta var, causando uma perda de tamanho \n
+        * essa perda de tamanho é o fator essencial p/ saber se o jogo possui linhas de padrão repetido \n
+        * portanto: "row_code" tendo tamanho 5, todas as linhas têm padrão diferente: jogo válido
         """
 
-        # 2 arrays, [15 índices 1] e [10 índices 0] (Volante têm 25 números, 15 são escolhidos e 10 ficam de fora)
         array_of_ones = []
         arrays_of_zeros = []
-
-        # Para não digitar 0 e 1 manualmente, eles são inseridos via "list comprehension"
         [array_of_ones.append(1) for n in range(15)]
         [arrays_of_zeros.append(0) for n in range(10)]
 
-        # ones_to_receive_1 = 15 números que terão 1    ones_to_receive_zero = 10 números que terão 0
         all_numbers = set(range(1, 26))
         ones_to_receive_1 = set(self.game)
         ones_to_receive_zero = all_numbers.difference(ones_to_receive_1)
 
-        "O que está sendo feito?"
-        # Se "self.game", possui, por exemplo: (1, 2, 3), ones_inside_game = [(1, 1), (2, 1), (3, 1)]
-        # Se "self.game", não possui, por exemplo: (4, 5, 6), ones_outside_game = [(4, 0), (5, 0), (6, 0)]
         ones_inside_game = list(zip(self.game, array_of_ones))
         ones_outside_game = list(zip(ones_to_receive_zero, arrays_of_zeros))
 
-        # Depois de organizar separadamente quem é 0 e quem é 1, todos os números podem ser juntados num mesmo array
+        # Junção: [(número de "self.game", 1), (número fora de "self.game", 0), ...]
         for outsider in ones_outside_game:
             ones_inside_game.append(outsider)
 
-        "O que está sendo feito?"
-        # O índice 0 de cada tupla é o número do volante, vamos arrumar o array na ordem crescente
-        # [(4, 0), (5, 0), (6, 0), (1, 1), (2, 1), (3, 1)] se torna [(1, 1), (2, 1), (3, 1), (4, 0), (5, 0), (6, 0)]
         tuples_ordered = sorted(ones_inside_game, key=lambda index_1st: index_1st[0])
 
-        "O que está sendo feito?"
-        # Sabendo quem é zero e quem é 1 e estando organizados, é coletado o índice 1 de cada tupla (seus binários)
-        # Usando os exemplos acima: [1, 2, 3, 4, 5] se torna [1, 1, 1, 0, 0]
-        # binary_result = array com 25 índices 0 ou 1
         binary_result = [index[1] for index in tuples_ordered]
 
-        # "binary_result" é quebrado em 5 grupos de 5 índices
         binary_group_1 = "".join([str(index) for index in binary_result[0:5]])
         binary_group_2 = "".join([str(index) for index in binary_result[5:10]])
         binary_group_3 = "".join([str(index) for index in binary_result[10:15]])
         binary_group_4 = "".join([str(index) for index in binary_result[15:20]])
         binary_group_5 = "".join([str(index) for index in binary_result[20:25]])
 
-        "O que está sendo feito?"
-        # Os 5 grupos são colocados num array, convertido p/ conjunto
-        # Qual o motivo da conversão? Se sabe que conjunto não aceita dados repetidos
-        # Havendo arrays repetidos, evidencia que algum grupo se repetiu, então a falha é detectada
         row_code = [binary_group_1, binary_group_2, binary_group_3, binary_group_4, binary_group_5]
         row_code_as_set = set(row_code)
 
-        # O conjunto manteve seu tamanho original (não há linhas repetidas) / alguma linha se repetiu
         if len(row_code_as_set) == 5:
             return {'ok': True, 'set': row_code_as_set, 'report': len(row_code_as_set)}
         return {'ok': False, 'set': row_code_as_set, 'report': len(row_code_as_set)}
@@ -293,46 +350,75 @@ class Card:
     # g_a
     def column_repetition(self) -> dict:
         """
-        Mais informações: consultas/colunas_repetidas.py (executar)
+        ===== Mais informações ===== \n
+        * consultas/colunas_repetidas.py \n
+
+        ===== Testes da função ===== \n
+        * testes/testes.py/test_column_repetition \n
+
+        ===== array_of_ones ===== \n
+        * array com 15 índices 1, onde "1" é a representação de números que foram chamados no jogo \n
+
+        ===== array_of_zeros ===== \n
+        * array com 10 índices 0, onde "0" é a representação de números que não foram chamados no jogo \n
+
+        ===== ones_to_receive_1 ===== \n
+        * possui todos os índices de "self.game" \n
+        * sua conversão p/ conjunto é necessária, pois é preciso coletar os números que não vieram \n
+
+        ===== ones_to_receive_zero ===== \n
+        * possui todos os números que "self.game" não possui (fora do jogo) \n
+
+        ===== ones_inside_game ===== \n
+        * junção de "self.game" + "array_of_ones" (o que é possível por terem a mesma qtd. de índices) \n
+
+        ===== ones_outside_game ===== \n
+        * junção de "self.game" + "array_of_zeros" (o que é possível por terem a mesma qtd. de índices) \n
+        * essa var será mesclada a "ones_inside_game" (ver # Junção) \n
+
+        ===== tuples_ordered ===== \n
+        * "ones_outside_game" passa a ser parte integrante de "ones_inside_game", deixando os dados desordenados \n
+        * essa var organiza os números em ordem crescente, pois eles precisam estar na sua posição original \n
+        * ex: tuples_ordered = [[1, 1], [6, 0], [11, 0], [16, 1], [21, 1]] \n
+
+        ===== binary_result ===== \n
+        * anexa todos os índices aninhados [1] de "tuples_ordered" \n
+        * usando o exemplo acima, binary_result = [1, 0, 0, 1, 1] \n
+        * esse procedimento é feito em todas as colunas, gerando 25 índices de 0 e 1 \n
+
+        ===== binary_group_int ===== \n
+        * var que desmembra os índices de "binary_result" em grupos de 5 (5 x 5 = 25 números) \n
+        * o objetivo disso é ter as 5 colunas de forma binária e saber se alguma delas é repetida \n
+        * todas as vars binárias "binary_group_int" são inseridas em "column_code" \n
+
+        ===== column_code ===== \n
+        * conjunto que recebe 5 strings binárias (se nenhuma delas for igual) \n
+        * caso haja igualdade, apenas uma das duas é anexada a esta var, causando uma perda de tamanho \n
+        * essa perda de tamanho é o fator essencial p/ saber se o jogo possui colunas de padrão repetido \n
+        * portanto: "column_code" tendo tamanho 5, todas as colunas têm padrão diferente: jogo válido
         """
 
-        # 2 arrays, [15 índices 1] e [10 índices 0] (Volante têm 25 números, 15 são escolhidos e 10 ficam de fora)
         array_of_ones = []
         arrays_of_zeros = []
-
-        # Para não digitar 0 e 1 manualmente, eles são inseridos via "list comprehension"
         [array_of_ones.append(1) for n in range(15)]
         [arrays_of_zeros.append(0) for n in range(10)]
 
-        # ones_to_receive_1 = 15 números que terão 1    ones_to_receive_zero = 10 números que terão 0
         all_numbers = set(range(1, 26))
         ones_to_receive_1 = set(self.game)
         ones_to_receive_zero = all_numbers.difference(ones_to_receive_1)
 
-        "O que está sendo feito?"
-        # Se "self.game", possui, por exemplo: (1, 6, 11), ones_inside_game = [(1, 1), (6, 1), (11, 1)]
-        # Se "self.game", não possui, por exemplo: (2, 7, 12), ones_outside_game = [(2, 0), (7, 0), (12, 0)]
         ones_inside_game = list(zip(self.game, array_of_ones))
         ones_outside_game = list(zip(ones_to_receive_zero, arrays_of_zeros))
 
-        # Depois de organizar separadamente quem é 0 e quem é 1, todos os números podem ser juntados num mesmo array
+        # Junção
         for tuple_element in ones_outside_game:
             ones_inside_game.append(tuple_element)
 
-        "O que está sendo feito?"
-        # O índice 0 de cada tupla é o número do volante, vamos arrumar o array na ordem crescente
-        # [(2, 0), (7, 0), (12, 0), (1, 1), (6, 1), (11, 1)] se torna [(1, 1), (2, 0), (6, 1), (7, 0), (11, 1), (12, 0)]
         tuples_ordered = sorted(ones_inside_game, key=lambda index_1st: index_1st[0])
 
         # O nome da variável foi modificada apenas p/ caber na linha abaixo
         x = tuples_ordered
 
-        "O que está sendo feito?"
-        # A variável "x" têm 25 índices, 15 são (int, 1), 10 são (int, 0), ela será quebrada em grupos de 5
-        # Colunas: [1, 6, 11, 16, 21] [2, 7, 12, 17, 22] [3, 8, 13, 18, 23] [4, 9, 14, 19, 24] [5, 10, 15, 20, 25]
-        # Os valores são -1 em relação aos abaixo, pois python usa índices começando com 0
-        # Temos índices aninhados, pois não é desejado o índice 0, apenas o 1 (binários)
-        # Conversão para tupla mandatória, pois conjunto não aceita array como dado
         binary_group_1 = tuple([x[0][1], x[5][1], x[10][1], x[15][1], x[20][1]])
         binary_group_2 = tuple([x[1][1], x[6][1], x[11][1], x[16][1], x[21][1]])
         binary_group_3 = tuple([x[2][1], x[7][1], x[12][1], x[17][1], x[22][1]])
@@ -342,66 +428,64 @@ class Card:
         # Para não ficar código repetido
         del tuples_ordered
 
-        "O que está sendo feito?"
-        # Os 5 grupos são colocados num array, convertido p/ conjunto
-        # Qual o motivo da conversão? Se sabe que conjunto não aceita dados repetidos
-        # Havendo arrays repetidos, evidencia que algum grupo se repetiu, então a falha é detectada
-        row_code = [binary_group_1, binary_group_2, binary_group_3, binary_group_4, binary_group_5]
-        row_code_as_set = set(row_code)
+        column_code = [binary_group_1, binary_group_2, binary_group_3, binary_group_4, binary_group_5]
+        column_code_as_set = set(column_code)
 
-        # O conjunto manteve seu tamanho original (não há colunas repetidas) / alguma linha se repetiu
-        if len(row_code_as_set) == 5:
-            return {'ok': True, 'set': row_code_as_set, 'report': len(row_code_as_set)}
-        return {'ok': False, 'set': row_code_as_set, 'report': len(row_code_as_set)}
+        if len(column_code_as_set) == 5:
+            return {'ok': True, 'set': column_code_as_set, 'report': len(column_code_as_set)}
+        return {'ok': False, 'set': column_code_as_set, 'report': len(column_code_as_set)}
 
     # h_a
     def avoid_long_sequences(self, reference: list, first_index=0, second_index=1) -> dict:
         """
-        Mais informações || consultas/numeros_seguidos.py (executar)
-        Teste            || testes.py/test_avoid_long_sequences
+        ===== Mais informações ===== \n
+        * consultas/numeros_seguidos_v2_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_avoid_long_sequences \n
+
+        ===== integer_list ===== \n
+        * recebe a subtração do índice posterior pelo índice anterior de "self.game" \n
+        * (índice 1 - índice 0)...(índice 2 - índice 1)...(índice 3 - índice 2)... \n
+
+        ===== answer ===== \n
+        * itera sob todos os índices de "integer_list" (que são inteiros) e os converte em strings específicas \n
+        * se o índice for 0, ele se torna 'y', se for acima de zero, ele se torna 'n' \n
+        * 'y' = número seguido ao outro -> 'n' = salto entre números \n
+        * self.game = [2, 4, 5, 7, 9, 12, 13, 14, 15, 16, 18, 19, 21, 22, 25] \n
+        * ex: answer = ['n', 'y', 'n', 'n', 'n', 'y', 'y', 'y', 'y', 'n', 'y', 'n', 'y', 'n'] \n
+
+        ===== answer_code ===== \n
+        * conversão do array "answer" em uma string \n
+        * ex: answer_code = nynnnyyyynynyn (conversão de "answer" acima) \n
+
+        ===== reference ===== \n
+        * var fonte que filtra as piores sequências de 'y' e 'n' de todos os jogos do banco \n
+        * ex: reference = ['yyyyyyyyyy', 'yyyyyyyyy', 'yyyyyyy', 'yyyyyy', 'yyyyyyyy'] = [11, 10, 8, 7, 9] \n
+        * essa var é comparada com "answer_code", e se ela for achada em "answer_code": jogo inválido \n
+        * pela lógica do exemplo, dentro de "answer_code", não deve haver nenhum dos índices em "reference" \n
+
+        ===== report ===== \n
+        * a cada índice em "reference" não encontrado, "report" recebe "True", se ele receber "False": jogo inválido
         """
 
-        # Recebe os cálculos no loop [índice 2 - índice 1, índice 3 - índice 2...]
         integer_list = []
-
-        # Após todos os cálculos acima (todos inteiros), estes são convertidos p/ strings: 'y', 'n'
         answer = []
 
-        "Substituído pelo parâmetro [ reference ]"
-        # in_row_7, in_row_8, in_row_9 = 'yyyyyy', 'yyyyyyy', 'yyyyyyyy'
-
         while second_index < len(self.game):
-            # O cálculo precisa ser 0. Vamos pegar o jogo [1, 2, 3, 5, 7, 8, 10, 11, 14, 16, 17, 19, 21, 24, 25]
-            # A lógica é: (2 - 1) (3 - 2) (5 - 3) (7 - 5) e assim por diante até acabar os índices do array
-            # Se os números são seguidos, o valor será 1, mas na anexação é subtraído por 1, ou seja, será 0
-            # No array que anexa, que é "integer_list", só pode haver 0 até 5 vezes (significa 5 números seguidos)
             integer_list.append((self.game[second_index] - self.game[first_index]) - 1)
             first_index += 1
             second_index += 1
 
-        # Aqui, a cada 0 achado em "integer_list", "answer" recebe uma string "y", não podendo passar de 5
         [answer.append('y') if integer == 0 else answer.append('n') for integer in integer_list]
 
-        # Depois os índices são mesclados em uma string p/ uso nas condições abaixo
         answer_code = "".join(answer)
 
-        "Código antigo (substituído)"
-        # Se for achado entre 6 a 8 números seguidos, o jogo é reprovado (+ números seguidos é praticamente impossível)
-        # if in_row_7 in answer_code or in_row_8 in answer_code or in_row_9 in answer_code:
-        #     return {'is_proper': False, 'calculus': integer_list, 'code': answer, 'code_str': answer_code}
-        # Até 5 valores seguidos (aceitável)
-        # return {'is_proper': True, 'calculus': integer_list, 'code': answer, 'code_str': answer_code}
-
-        "O que está sendo feito?"
-        # "answer_code" é o código string resultante de "self.game"
-        # Esse código é comparado entre os códigos vindos de "reference"
-        # Se ele for achado, "report" recebe "False", o que indica um problema no jogo
         report = []
         for code in reference:
             if code not in answer_code: report.append(True)
             else: report.append(False)
 
-        # "reference" contém os padrões menos comuns (ruins)
         if False in report:
             return {'ok': False, 'calculus': integer_list, 'report': answer_code, 'proof': report}
         return {'ok': True, 'calculus': integer_list, 'report': answer_code, 'proof': report}
@@ -409,28 +493,39 @@ class Card:
     # i_a
     def game_type(self, reference) -> dict:
         """
-        Mais informações || consultas/tipo_de_jogo_v2_poo.py
-        Teste            || testes.py/test_game_type
+        ===== Mais informações ===== \n
+        * consultas/tipo_de_jogo_v2_poo.py \n
+
+        ===== Teste ===== \n
+        * testes/testes.py/test_game_type \n
+
+        ===== upper ===== \n
+        * var incrementadora quando "self.game" possui um dos números da parte de cima do volante \n
+
+        ===== lower ===== \n
+        * var incrementadora quando "self.game" possui um dos números da parte de baixo do volante \n
+
+        ===== loop ===== \n
+        * sintaxe usada p/ fazer a detecção e incrementação das vars "upper" e "lower" \n
+
+        ===== game_class ===== \n
+        * string que representa respectivamente as quantidades: números de cima (1 ao 15)/números de baixo (16/25) \n
+
+        ===== reference ===== \n
+        * var fonte que filtra as strings de sequências de tipo de jogo mais comuns (acima de 10% de frequência) \n
+
+        ===== condição final ===== \n
+        * se o tipo de jogo de "self.game" estiver em "reference": jogo válido
         """
 
-        # Contador da parte 1, contador da parte2, parte 1 do volante, parte 2 do volante
         upper, lower, upper_area, lower_area = 0, 0, tuple(range(1, 16)), tuple(range(16, 26))
 
-        # Iteração sob cada número do jogo, se for entre 1 até 15: [upper += 1], se for entre 16 a 25: [lower += 1]
         for number in self.game:
-            if number in upper_area:
-                upper += 1
-            elif number in lower_area:
-                lower += 1
+            if number in upper_area: upper += 1
+            elif number in lower_area: lower += 1
 
-        # String do jogo "self.game"
         game_class = f"{upper}/{lower}"
 
-        "Substituído por [core_var]"
-        # De acordo com "consultas/tipo_de_jogo.py" esses tipos são os mais recorrentes
-        # right = ['8/7', '9/6', '10/5']
-
-        # String do jogo deve estar em "reference" (tipos de jogos com frequência acima de 10%)
         if game_class in reference:
             return {'ok': True, 'report': game_class}
         return {'ok': False, 'report': game_class}
@@ -439,78 +534,116 @@ class Card:
     @staticmethod
     def prime_numbers_counter(target_game, references) -> dict:
         """
-        Mais informações || estatistica/contar_numeros_primos_v2_poo.py
-        Teste            || testes.py/test_prime_numbers_counter
+        ===== Mais informações ===== \n
+        * estatistica/contar_numeros_primos_v2_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_prime_numbers_counter \n
+
+        ===== prime_numbers_box ===== \n
+        * var container p/ os números primos achados do parâmetro "target_game" (jogo criado) \n
+
+        ===== array_size ===== \n
+        * tamanho do array "prime_numbers_box" \n
+
+        ===== target_game ===== \n
+        * var que se faz necessário, pois essa é uma função de comparação (se não fosse, usaria apenas "self.game") \n
+
+        ===== references ===== \n
+        * ex: reference[0] = [5, 6, 4, 7] \n
+        * contêm dois arrays, mas o índice [1] passou a ser desconsiderado \n
+        * seu índice [0] é um array que contêm os índices que representam as qtds. mais comuns de números primos \n
+
+        ===== condição final ===== \n
+        * se o tamanho de "array_size" estiver dentro de "references[0]": jogo válido \n
+        * ex: prime_numbers_box = [5, 7, 13, 23] -> array_size = 4 -> está dentro de references[0]
         """
 
         prime_numbers = [2, 3, 5, 7, 11, 13, 17, 19, 23]
         prime_numbers_box = []
 
-        "Substituída por [primes]"
-        # De acordo com "consultas/contar_numeros_primos.py" a qtd. de números primos mais comuns: [4, 5, 6, 7]
-        # proper_amounts = range(4, 8)
-
-        ""
-        # O que for achado em "self.game" de número primo é inserido em "prime_numbers_box"
         for number in target_game:
             if number in prime_numbers:
                 prime_numbers_box.append(number)
 
-        "Removido"
-        # # Dos 3 primos mais recorrentes, pelo menos 1 deles deve estar no jogo
-        # one_is_true = []
-        # [one_is_true.append(True) if number in references[1] else one_is_true.append(False) for number in self.game]
-
-        "Removido"
-        # if len(prime_numbers_box) in references[0] and one_is_true.count(True) >= 1:
-
-        "Removido (junto com a continuação da condição: and has_one_most_common)"
-        # must_have_true = []
-        # has_one_most_common = ''
-        # for number in references[1]:
-        #     must_have_true.append(number in self.game)
-        # if True in must_have_true: has_one_most_common = True
-
-        ""
-        # A quantidade de números primos encontrados está entre as quantidades mais recorrentes
         array_size = len(prime_numbers_box)
-        if len(prime_numbers_box) in references[0]:
+
+        if array_size in references[0]:
             return {'ok': True, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]', 'array': prime_numbers_box}
         return {'ok': False, 'report': f'{prime_numbers_box} [ {array_size} número(s) ]', 'array': prime_numbers_box}
 
     # k_a
-    def score_admin(self, single_score, score, has_comparison=False, operator='equals', repeated=0) -> [int, str]:
+    def score_admin(self,
+                    single_score: bool,
+                    score: int,
+                    has_comparison=False,
+                    operator='equals',
+                    repeated=0
+                    ) -> [int, str]:
         """
-        :param single_score:   Se apenas uma pontuação será verificada em "scores"
-        :param score:          Qual o valor/chave procurado em "scores"
-        :param has_comparison: Informar que "score" será comparado a "repeated"
-        :param operator:       Operador de comparação
-        :param repeated:       Valor a ser comparado (valor máximo de repetição)
+        ===== Mais informações ===== \n
+        * consultas/pontuacao.py \n
 
-        Mais informações || consultas/pontuacao.py
-        Teste            || testes/test_score_admin
+        ===== Teste da função ===== \n
+        * testes/test_score_admin \n
+
+        ===== similarities ===== \n
+        * var container do tamanho de cada uma das interseções de "self.game" em relação a todos os jogos \n
+
+        ===== precisions ===== \n
+        * var container que filtra de "similarities" a contagem de todas as qtds. separadamente \n
+        * ex: similarities = [6, 9, 11, 9] -> precisions = [.count(6), .count(9), .count(11)] -> [1, 2, 1] \n
+
+        ===== score_panel ===== \n
+        * desempacotamento de "precisions", exibindo todas as similaridades de "self.game" \n
+
+        ===== scores ===== \n
+        * var relatório das contagens de cada pontuação (6: qtd. int., ...15: qtd. int) \n
+        * só é criada se "single_score" = True (desejado saber uma quantidade específica) \n
+
+        ===== single_score ===== \n
+        * parâmetro usável quando se quer saber a qtd. de uma pontuação específica do relatório de "scores" \n
+
+        ===== score ===== \n
+        * parâmetro que representa a pontuação desejada p/ consultar em "self.game" em relação a todos os jogos \n
+        * ex: score = 13 (quantas vezes "self.game" fez 13 pontos no total) \n
+        * esse valor é usado para ser procurado em "scores" \n
+
+        ===== box_with_score ===== \n
+        * var de captura que usa o parâmetro "score" como chave para pegar o valor da chave em "scores" \n
+        * ex: score = 13 -> scores = {13: 1072} -> box_with_score = [1072] \n
+
+        ===== score_found ===== \n
+        * var que acessa o índice único de "box_with_score" \n
+
+        ===== has_comparison ===== \n
+        * parâmetro p/ dizer se é desejado saber uma pontuação especifica de "self.game" em relação a todos os jogos \n
+
+        ===== correct & incorrect ===== \n
+        * resultado obtido pela consulta função \n
+
+        ===== operator ===== \n
+        * parâmetro que define a hierarquia que "repeated" deve seguir \n
+        * ex: score = 13 -> operator = 'greater' -> repeated = 2 (jogo deve ter feito 13 pontos mais de 2 vezes) \n
+
+        ===== repeated ===== \n
+        * parâmetro que representa quantas vezes o parâmetro "score" deve ter em qtd.
         """
 
-        # Recebe o resultado (inteiro) da qtd. de similaridades de "self.game" com cada jogo de "self.database"
         similarities = []
 
-        ""
-        # Os jogos em "self.database" são tuplas, p/ saber a interseção é preciso conversão p/ conjunto
-        # "similarity_target_game_vs_db_game" = inteiro que representa a similaridade (inserido em "similarities")
         for i in range(len(self.database)):
             game_main_as_set = set(self.game)
             game_comparared_as_set = set(self.database[i])
             similarity_target_game_vs_db_game = len(game_main_as_set.intersection(game_comparared_as_set))
             similarities.append(similarity_target_game_vs_db_game)
 
-        # Cada qtd. é contada e se torna um índice aqui (de 6 até 15)
         precisions = [
             similarities.count(6), similarities.count(7), similarities.count(8), similarities.count(9),
             similarities.count(10), similarities.count(11), similarities.count(12), similarities.count(13),
             similarities.count(14), similarities.count(15)
         ]
 
-        # As qtds. são separadas e organizadas neste painel
         score_panel = f"""
         Jogo analisado: {self.game}
         ========== PONTUAÇÃO GLOBAL ==========
@@ -525,18 +658,12 @@ class Card:
         14 pontos || {precisions[8]} vezes
         15 pontos || {precisions[9]} vezes"""
 
-        # Quando for desejado saber um dos pontos (entre 6 a 15) (via "score")
         if single_score:
-            # Cada pontuação
             scores = {
                 6: precisions[0], 7: precisions[1], 8: precisions[2], 9: precisions[3], 10: precisions[4],
                 11: precisions[5], 12: precisions[6], 13: precisions[7], 14: precisions[8], 15: precisions[9],
             }
 
-            ""
-            # Supondo que se queira saber se "self.game" já fez 13 pontos, então, "score" deve ser 13
-            # Seguindo a lógica, "scores" vai até a chave "13" e busca seu valor, passando a "box_with_score"
-            # box_with_score[0] = inteiro de quantas vezes a similaridade 13 foi encontrada
             box_with_score = []
             [box_with_score.append(scores[key]) for key in scores if score == key]
 
@@ -544,21 +671,16 @@ class Card:
             correct = {'ok': True, 'banner': score_panel, 'report': score_found}
             incorrect = {'ok': False, 'banner': score_panel, 'report': score_found}
 
-            ""
-            # Filtrar quantas vezes uma similaridade aconteceu
-            # Supondo que se queira saber se a similaridade 13 se repetiu uma vez
-            # Então: score=13 & repeated=1 & operator='equals'
-            # (has_comparison, operator, repeated) (quer comparação, comparador, pontuação)
             if has_comparison and operator == 'equals':
                 if box_with_score[0] == repeated:
                     return correct
                 return incorrect
             if has_comparison and operator == 'greater':
-                if box_with_score[0] >= repeated:
+                if box_with_score[0] > repeated:
                     return correct
                 return incorrect
             if has_comparison and operator == 'lesser':
-                if box_with_score[0] <= repeated:
+                if box_with_score[0] < repeated:
                     return correct
                 return incorrect
 
@@ -571,28 +693,42 @@ class Card:
     # l_a
     def numbers_frequency(self, references) -> dict:
         """
-        Mais informações || estatistica/frequencia_numeros_poo.py
-        Teste            || testes/test_numbers_frequency
-        """
+        ===== Mais informações ===== \n
+        * estatistica/frequencia_numeros_poo.py \n
 
-        ""
-        # "references[0]" remete aos números que possuem frequência acima de 60% do total de jogos
-        # O tamanho de "references[0]" muda conforme novos jogos vão sendo lançados, pois as porcentagens mudam
-        # "self.game" é comparado com "references[0]"
-        # Objetivo: saber quantos números de "self.game" estão entre os que vêm acima de 60%
-        # Ao saber a qtd., ela é atribuida a "similarity_amount"
+        ===== Testes da função ===== \n
+        * testes/testes.py/test_numbers_frequency \n
+
+        ===== references[0] ===== \n
+        * conjunto de números que possuem frequência acima de 60% do total de jogos da Lotofácil \n
+        * seu tamanho muda conforme novos jogos vão sendo lançados, pois as porcentagens mudam com eles \n
+        * ele é comparado com "self.game" (jogo criado pelo algoritmo) \n
+        * o objetivo é detectar quantos números de "self.game" estão entre os que vêm acima de 60% \n
+        * a análise é guardada em "similatiry" (em dados) e contada em "similarity_amount" \n
+
+        ===== similarity (set) ===== \n
+        * resultado da comparação entre "self.game" e os números mais comuns do Lotofácil
+
+        ===== similarity_amount (int) ===== \n
+        * conversão dos dados de "similarity" p/ um dado numérico \n
+
+        ===== references[1] ===== \n
+        * apesar de haver muitos números com frequência acima de 60%, todos não virão de uma vez \n
+        * foi especulado algo entre 40% a 70%, que é uma margem lógica aceitável \n
+        * ela está diretamente conectada a "references[0]" \n
+        * suas chaves são ['40%'] e ['70%'], que são o cálculos representantes do tamanho de "references[0]" \n
+        * ex: "len(references[0]) = 10" -> "references[1]['40%'] = 4" -> "references[1]['70%'] = 7" \n
+        * essas chaves são os valores que determinam o "range" permitido de números mais comuns (aqui: 4 a 7) \n
+        * "references[0]" é alterável, o que afeta diretamente "references[1]" \n
+        * razões que alteram? novos jogos lançados, outros números podem alcançar 60%+ de frequência \n
+
+        ===== Condição final ====== \n
+        * se os números de "self.game" não respeitarem a margem de 40% a 70%: jogo inválido
+        """
 
         similarity = set(self.game).intersection(set(references[0]))
         similarity_amount = len(similarity)
 
-        ""
-        # Apesar de haver muitos números com frequência acima de 60%, obviamente todos não virão
-        # Foi especulado algo entre 40% a 70%, que é uma margem lógica aceitável
-        # Com base no tamanho do array "references[0]", "references[1]" pode ter seus valores alterados
-        # Exemplo: quando esta função foi feita, "len(references[0]) = 10"
-        # Com base nisso [40% de 10 = 4] e [70% de 10 = 7], então "similarity_amount" deve estar entre esses valores
-        # Caso não esteja, o jogo é considerado problemático
-        # Conforme "len(references[0])" muda, "len(references[1])" pode mudar
         if references[1]['40%'] <= similarity_amount <= references[1]['70%']:
             return {'ok': True, 'report': similarity}
         return {'ok': False, 'report': similarity}
@@ -600,48 +736,77 @@ class Card:
     # m_a
     def ten_last_comparison(self, reference) -> dict:
         """
-        Mais informações || não possui
-        Teste            || testes_test_ten_last_comparison
+        ===== Teste de função ===== \n
+        * testes/testes.py/test_ten_last_comparison \n
+
+        ===== bad_codes ===== \n
+        * sequências de interseções ruins (que são muitos seguidas) \n
+
+        ===== exceeding_patterns ===== \n
+        * var que age sob "bad_codes" p/ confirmar com booleanos \n
+
+        ===== bad_combinations ===== \n
+        * sequências de interseções improváveis (que são muito lineares/padronizadas) \n
+
+        ===== stupid_patterns ===== \n
+        * var que age sob "bad_combinations" p/ confirmar com booleanos \n
+
+        ===== too_similar ===== \n
+        * var que procura interseções de 11 frequentes (definido: 2) entre "self.game" em relação aos 10 últimos jogos
+        * se isso acontecer, o valor booleano dessa var é alterada e o jogo é invalidado (ver análise [1])
+
+        ===== result ===== \n
+        * guarda todas as interseções (convertidas em inteiro) entre "self.game" e os 10 últimos jogos \n
+
+        ===== intersection_code ===== \n
+        * string do resultado de todas as similaridades (ex: result = [6, 10, 11, 8]) (ex: intersection_code = 610118)
+        * esse código é comparado com cada índice de "bad_code" e "bad_combinations"
+        * se esse código for achado nestas vars, o jogo é invalidado (ver análise [2]) (ver análise [3]) \n
+
+        ===== conditions ===== \n
+        * Carrega todas as condições requisito p/ "self.game" passar pelos critérios da função \n
+        * 1: Similaridades de 5 a 7 ausentes (muito distantes) \n
+        * 2: Similaridades de 13 a 15 ausentes (muito próximas) \n
+        * 3: Similaridades de 8 a 11 presentes (muito comuns) \n
+        * 4: Similaridade de "self.game" em relação ao último jogo deve estar entre 8 a 10 \n
+        * 5: A similaridades dos dois últimos jogos devem ser diferentes \n
+        * 6: As similaridades não se repetem muitas vezes seguidas (não mais do que 2) \n
+        * 7: Não há sequências crescentes e decrescentes de interseções \n
+        * 8: Não há mais do que duas similaridades de 11 entre "self.game" e os 10 últimos jogos \n
         """
 
-        # Sequências de interseções ruins (muitos seguidas) & sua confirmação
-        bad_codes = ['888', '8888', '88888', '999', '9999', '99999', '101010', '10101010', '1010101010']
+        bad_codes = ('888', '8888', '88888', '999', '9999', '99999', '101010', '10101010', '1010101010')
         exceeding_patterns = []
 
-        # Sequências de interseções improváveis (muito lineares/padronizadas) & sua confirmação
-        bad_combinations = [
+        bad_combinations = (
             '891011', '111098', '8910', '91011', '11109', '1098',
             '8989', '810810', '811811',
             '9898', '910910', '911911',
             '108108', '109109', '10111011',
             '118118', '119119', '11101110',
-        ]
+        )
         stupid_patterns = []
 
-        # O valor dessa var muda e invalida o jogo, caso "self.game" possua + do que 2 similaridades de 11
         too_similar = False
 
-        # "self.game" é comparado com os 10 últimos jogos lançados, p/ saber sua similaridade em relação a eles
-        # "result" = 10 índices inteiros resultantes das similaridades de "self.game" com os outros 10 jogos
         result = []
         for index, game in enumerate(reference):
             result.append(len(set(game).intersection(set(self.game))))
 
-        # Representação em string do resultado de todas as similaridades (ex: [6, 10, 11, 8] = 610118)
         intersection_code = "".join([str(index) for index in result])
 
-        # Se "else" for satisfeita, o jogo é considerado problemático
+        # Análise [1]: Condição satisfeita: jogo invalidado
+        if result.count(11) > 2: too_similar = True
+
+        # Análise [2]: else satisfeito, jogo invalidado
         for code in bad_codes:
             if code not in intersection_code: exceeding_patterns.append(False)
             else: exceeding_patterns.append(True)
 
-        # Interseções em ordem crescente ou decrescente são algo sem lógica (muito improvável)
+        # Análise [3]: else satisfeito, jogo invalidado
         for code in bad_combinations:
             if code not in intersection_code: stupid_patterns.append(False)
             else: stupid_patterns.append(True)
-
-        # Condição satisfeita: jogo invalidado
-        if result.count(11) > 2: too_similar = True
 
         # Todas as condições em "conditions" devem ser "True", ou seja, não deve haver "False" anexado a "box"
         box = []
@@ -649,15 +814,6 @@ class Card:
         last_game = result[-1]
         very_similar_range = range(11, 16)
         very_different_range = 7
-        "INTERPRETAÇÕES"
-        # 1: Similaridades de 5 a 7 ausentes (muito distantes)
-        # 2: Similaridades de 13 a 15 ausentes (muito próximas)
-        # 3: Similaridades de 8 a 11 presentes (muitos comuns)
-        # 4: Similaridade de "self.game" em relação ao último jogo deve estar entre 8 a 10
-        # 5: A similaridades dos dois últimos jogos devem ser diferentes
-        # 6: As similaridades não se repetem muitas vezes seguidas (não mais do que 2)
-        # 7: Não há sequências crescentes e decrescentes de interseções
-        # 8: Não há mais do que duas similaridades de 11 entre "self.game" e os 10 últimos jogos
         conditions = {
             1: box.append(True) if 5 not in result and 6 not in result and 7 not in result else box.append(False),
             2: box.append(True) if 12 not in result and 13 not in result and 14 not in result and 15 not in result else box.append(False),
@@ -676,11 +832,39 @@ class Card:
     # n_a
     def three_in_a_row_counter(self, reference) -> dict:
         """
-        Mais informações || estatistica/grupos_de_numeros_poo.py (Executar)
-        Teste            || testes/test_three_in_a_row_counter
+        ===== Mais informações ====== \n
+        * estatistica/grupos_de_numeros_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_three_in_a_row_counter \n
+
+        ===== rows ===== \n
+        * armazena arrays com todas as combinações possíveis de 3 números seguidos (23 combinações) \n
+        * ex: [1, 2, 3] [2, 3, 4]...[23, 24, 25] \n
+
+        ===== game_cells ===== \n
+        * armazena o jogo criado em partes fragmentas em índices de 3 \n
+        * ex: (1, 4, 5, 7, 8, 10, 12, 13, 14, 15, 17, 21, 22, 23, 24) \n
+        * game_cells = [[1, 4, 5], [4, 5, 7], [5, 7, 8]...[22, 23, 24]] \n
+
+        ===== three_in_a_row_sequence ===== \n
+        * var contadora das quantidades encontradas dos grupos de 3 números seguidos \n
+        * cada índice array de "game_cells" (jogo) é procurado em "rows" (todos os números do jogo) \n
+        * se for encontrado, esta var é incrementada a cada sequência achada \n
+        * em quase todos os jogos, sempre saem sequências de 3 números seguidos \n
+        * no período deste projeto, as quantidades mais comuns são: 4, 5, 3, 6 \n
+        * isso significa que dentre todos os jogos, é mais comum ter 3, 4, 5 ou 6 grupos de 3 números seguidos \n
+        * [4, 5, 3, 6] são as qtds. com recorrência acima de 10%, enquanto as outras estão abaixo disso \n
+        * portanto, esta var deve ser um inteiro entre [4, 5, 3, 6], senão: jogo inválido \n
+
+        ===== reference ===== \n
+        * var fonte que trás o tamanho do array com as sequências de grupos de 3 seguidos mais comuns \n
+        * essa var é a referência onde o valor de "three_in_a_row_sequence" deve estar contido \n
+
+        ===== Condição final ===== \n
+        * Se a qtd. de grupos de 3 números seguidos em "self.game" estiver contido em "reference": jogo válido
         """
 
-        # Um array com as 23 combinações de 3 números seguidos: [1, 2, 3] [2, 3, 4] até [23, 24, 25]
         rows = []
         i, i2, i3 = 1, 2, 3
         for n in range(23):
@@ -689,28 +873,17 @@ class Card:
             i2 += 1
             i3 += 1
 
-        # Quebra do jogo em grupos de 3 números
         game_cells = [
             self.game[0:3], self.game[1:4], self.game[2:5], self.game[3:6], self.game[4:7],
             self.game[5:8], self.game[6:9], self.game[7:10], self.game[8:11], self.game[9:12],
             self.game[10:13], self.game[11:14], self.game[12:15]
         ]
 
-        ""
-        # Em todos os jogos, sempre sai alguma sequência de 3 números seguidos (ou quase todos)
-        # No período deste projeto, as quantidades mais comuns são: 4, 5, 3, 6
-        # Tradução? Em todos os jogos, normalmente há 3, 4, 5 ou 6 grupos de 3 números seguidos
-        # [4, 5, 3, 6] são as quantidades com recorrência (acima de 10%), enquanto as outras estão abaixo disso
-        # Conforme novos jogos são lançados, novos valores podem entrar (se conseguirem 10%+) ou sair deste array
-        # "three_in_a_row_sequence" é o contador dessas quantidades encontradas
-        # Ou seja, "three_in_a_row_sequence" deve ser um inteiro entre [4, 5, 3, 6]
-        # Caso não seja, o jogo é considerado inválido (por ter grupos de 3 demais ou de menos)
         three_in_a_row_sequence = 0
         for cell in game_cells:
             if cell in rows:
                 three_in_a_row_sequence += 1
 
-        # Jogo possui grupos de 3 números seguidos apropriados / não possui
         if three_in_a_row_sequence in reference:
             return {'ok': True, 'report': three_in_a_row_sequence}
         return {'ok': False, 'report': three_in_a_row_sequence}
@@ -719,15 +892,46 @@ class Card:
     @staticmethod
     def get_border_or_center_size(target_game, site, references):
         """
-        Mais informações || estatistica/borda_centro_poo.py (Executar)
-        Teste            || testes/test_get_border_or_center_size
+        ===== Mais informações ===== \n
+        * estatistica/borda_centro_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_get_border_or_center_size \n
+
+        ===== card_edges ===== \n
+        * anexa os números de borda encontrados em cada índice de "self.game" \n
+        * no loop 1, cada índice do jogo é verificado via "target_game" e este array recebe os números de borda
+
+        ===== card_center ===== \n
+        * anexa os números de centro encontrados em cada índice de "self.game" \n
+        * no loop 2, cada índice do jogo é verificado via "target_game" e este array recebe os números de centro \n
+
+        ===== target_game ===== \n
+        * parâmetro que representa o jogo analizado \n
+        * essa é uma função de comparação, o que significa que não apenas "self.game" será usado \n
+
+        ===== edge_amount ===== \n
+        * var contadora da qtd. de índices em "card_edges" (qtd. de números de borda) \n
+
+        ===== center_amount ===== \n
+        * var contadora da qtd. de índices em "card_center" (qtd. de números de centro) \n
+
+        ===== site (str) ===== \n
+        * parâmetro que indica qual orientação usar: borda ou centro \n
+
+        ===== references[0] ====== \n
+        * var container p/ a qtd. de números de borda mais recorrentes (freq. de 10%+) \n
+
+        ===== references[1] ====== \n
+        * var container p/ a qtd. de números de centro mais recorrentes (freq. de 10%) \n
+
+        ===== Condição final ===== \n
+        * se as qtds. de números de borda (edge_amount) ou centro (center_amount) estiverem em "reference": jogo válido
         """
 
-        # Anexa os números de canto e centro encontrados em "self.game", respectivamente
         card_edges = []
         card_center = []
 
-        # Todos os números de borda do volante (quadrado)
         for n in list(target_game):
             if n == 1 or n == 2 or n == 3 or n == 4 or n == 5 or \
              n == 10 or n == 15 or n == 20 or n == 25 or \
@@ -735,25 +939,16 @@ class Card:
              n == 16 or n == 11 or n == 6:
                 card_edges.append(n)
 
-        # Todos os números de centro do volante (retângulo)
         for n in list(target_game):
             if n == 7 or n == 8 or n == 9 or n == 12 or n == 13 or n == 14 or n == 17 or n == 18 or n == 19:
                 card_center.append(n)
 
-        ""
-        # Quando for desejado analisar os números de borda (16 números)
-        # "references[0]" = qtd. de números de borda mais recorrentes (10%+)
-        # "card_edges" define a qtd. de números de borda. Essa qtd. estando em "references[0]": jogo válido
         edge_amount = len(card_edges)
         if site == 'edges':
             if edge_amount in references[0]:
                 return {'ok': True, 'report': edge_amount, 'array': card_edges}
             return {'ok': False, 'report': edge_amount, 'array': card_edges}
 
-        ""
-        # Quando for desejado analisar os números de centro (9 números)
-        # "references[1]" = qtd. de números de centro mais recorrentes (10%+)
-        # "card_center" define a qtd. de números de centro. Essa qtd. estando em "references[1]": jogo válido
         center_amount = len(card_center)
         if site == 'center':
             if center_amount in references[1]:
@@ -763,10 +958,36 @@ class Card:
     # q_a
     @staticmethod
     def horizontal_code(reference, target_game):
-        # Contagem de números em cada linha
+        """
+        ===== Mais informações ===== \n
+        * estatistica/grupos_horizontais_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_horizontal_code \n
+
+        ===== rows ===== \n
+        * var container com chaves que têm valores incrementáveis com base nos índices do parâmetro "target_game" \n
+
+        ===== loop ===== \n
+        * onde as chaves de "rows" são incrementadas, cada índice de "target_game" é encontrado em um range \n
+
+        ===== game_code_tuple ===== \n
+        * var com todas chaves de "rows" (5 números inteiros) = qtd. de números por linha do jogo \n
+
+        ===== game_code_str ===== \n
+        * var conversora de todos os inteiros em "game_code_tuple" para string, e em seguida mescladas como string \n
+        * ex: game_code_tuple = (4, 3, 3, 2, 3) -> game_code_str = "".join(('4', '3', '3', '2', '3')) ... '43323' \n
+
+        ===== reference ===== \n
+        * var fonte que armazena os grupos horizontais mais comuns dentre todos os jogos da Lotofácil (freq. 1% +) \n
+        * como há muitas combinações, muitas já sairam, e foram filtradas somente aquelas com mais de 1% \n
+
+        ===== condição final ===== \n
+        * se "game_code_str" estiver dentre os índices de "reference": jogo válido
+        """
+
         rows = {'1st': 0, '2nd': 0, '3rd': 0, '4th': 0, '5th': 0}
 
-        # Dos 15 números de "self.game", conforme forem detectados nos ranges, as chaves de "rows" são alteradas
         for number in target_game:
             if number in range(1, 6): rows['1st'] += 1
             elif number in range(6, 11): rows['2nd'] += 1
@@ -774,13 +995,10 @@ class Card:
             elif number in range(16, 21): rows['4th'] += 1
             elif number in range(21, 26): rows['5th'] += 1
 
-        # Todos os valores das chaves em "rows" são passadas p/ uma tupla
         game_code_tuple = tuple(rows.values())
 
-        # Os índices de cada valor são mesclados como um número string
         game_code_str = "".join([str(int_index) for int_index in game_code_tuple])
 
-        # Jogo válido: grupo horizontal de "self.game" está entre os mais comuns / Jogo inválido
         if game_code_str in reference:
             return {
                 'ok': True,
@@ -793,7 +1011,39 @@ class Card:
     # r_a
     @staticmethod
     def vertical_code(reference, target_game):
-        # Contagem de números em cada coluna
+        """
+        ===== Mais informações ===== \n
+        * estatistica/grupos_verticais_poo.py \n
+
+        ===== Teste da função ===== \n
+        * testes/testes.py/test_vertical_code \n
+
+        ===== columns ===== \n
+        * dicionário com chave contendo todos os 25 números possíveis, quebrados em forma de coluna \n
+        * dicionário com chave contendo valores incrementáveis com base nos índices encontrados em "target_game" \n
+
+        ===== target_game ===== \n
+        * var do jogo criado, onde cada índice dessa tupla é procurada em todas as chaves "sequence" de "columns" \n
+
+        ===== loop ===== \n
+        * forma de gerar a interação especificada em "target_game" \n
+        * cada "number" do loop é um índice do jogo, que é comparado com todas as chaves "sequence" de "columns" \n
+
+        ===== game_code_tuple ===== \n
+        * var com todas chaves "countage" de "columns" (5 números inteiros) = qtd. de números por coluna do jogo \n
+
+        ===== game_code_str ===== \n
+        * var conversora de todos os inteiros em "game_code_tuple" para string, e em seguida mescladas como string \n
+        * ex: game_code_tuple = (4, 3, 3, 2, 3) -> game_code_str = "".join(('4', '3', '3', '2', '3')) ... '43323' \n
+
+        ===== reference ===== \n
+        * var fonte que armazena os grupos verticais mais comuns dentre todos os jogos da Lotofácil (freq. 1% +) \n
+        * como há muitas combinações, muitas já sairam, e foram filtradas somente aquelas com mais de 1% \n
+
+        ===== condição final ===== \n
+        * se "game_code_str" estiver dentre os índices de "reference": jogo válido
+        """
+
         columns = {
             '1st': {'sequence': [1, 6, 11, 16, 21], 'countage': 0},
             '2nd': {'sequence': [2, 7, 12, 17, 22], 'countage': 0},
@@ -801,14 +1051,6 @@ class Card:
             '4th': {'sequence': [4, 9, 14, 19, 24], 'countage': 0},
             '5th': {'sequence': [5, 10, 15, 20, 25], 'countage': 0}
         }
-
-        ""
-        # As chaves "sequence" são todos os 25 números possíveis, quebrados em colunas
-        # Cada número de "self.game" é procurado nestes arrays (todos estarão dentre os 25)
-        # O que for achado, a chave "countage" é alterada
-        # Ex: Supondo que self.game tenha 4, em algum momento, no loop abaixo, ele passará por [4, 9, 14, 19, 24]
-        # Antes disso acontecer: '4th': {'sequence': [4, 9, 14, 19, 24], 'countage': 0} "countage" ainda é 0
-        # Após disso acontecer : '4th': {'sequence': [4, 9, 14, 19, 24], 'countage': 1} "countage" mudará p/ 1
 
         for number in target_game:
             if number in columns['1st']['sequence']:
@@ -822,20 +1064,13 @@ class Card:
             elif number in columns['5th']['sequence']:
                 columns['5th']['countage'] += 1
 
-        ""
-        # Todos os valores das chaves em "countage" são passadas p/ uma tupla
-        # Ex: game_code_tuple = (3, 3, 3, 3, 3) [a soma dos valore sempre será 15]
         game_code_tuple = (
             columns['1st']['countage'], columns['2nd']['countage'], columns['3rd']['countage'],
             columns['4th']['countage'], columns['5th']['countage']
         )
 
-        ""
-        # Os índices de cada valor são mesclados como um número string
-        # Ex: tomando o exemplo acima [3, 3, 3, 3, 3] se torna '33333'
         game_code_str = "".join([str(int_index) for int_index in game_code_tuple])
 
-        # Se '33333' é um dos índices de "reference": Jogo válido / jogo descartado
         if game_code_str in reference:
             return {
                 'ok': True,

@@ -165,3 +165,4 @@ class PrimeNumbers:
 
 prime_numbers_amount_allowed = PrimeNumbers(db=dtb).prime_numbers_amount_allowed
 most_common_primes = PrimeNumbers(db=dtb).most_common_primes
+# print(prime_numbers_amount_allowed)

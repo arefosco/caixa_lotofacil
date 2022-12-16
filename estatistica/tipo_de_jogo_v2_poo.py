@@ -135,3 +135,4 @@ class GameType:
 
 
 game_types = GameType(db=dtb).game_types
+# print(game_types)

@@ -160,3 +160,5 @@ class BorderOrCenter:
 
 most_frequent_edges = BorderOrCenter(db=dtb).most_common_edges_amount
 most_frequent_centers = BorderOrCenter(db=dtb).most_common_centers_amount
+# print(most_frequent_edges)
+# print(most_frequent_centers)
